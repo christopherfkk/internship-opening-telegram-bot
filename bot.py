@@ -2,12 +2,13 @@ import requests
 import time
 import schedule
 from bs4 import BeautifulSoup
+import os
 
 
 def send_text(message):
     # Define parameters
-    bot_token = '5681278553:AAGnjq_ug03ufuTZsyPtoEjBQ6gdsbdfuxU'
-    my_chat_id = '1265317941'
+    bot_token = os.environ['TELEGRAM BOT TOKEN']
+    my_chat_id = os.environ['TELEGRAM CHAT ID']
     parse_mode = 'Markdown'
 
     # Assemble URL

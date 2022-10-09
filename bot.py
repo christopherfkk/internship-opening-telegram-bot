@@ -1,7 +1,6 @@
 import os
 import requests
 from bs4 import BeautifulSoup
-import json
 import time
 import schedule
 
@@ -20,7 +19,7 @@ def send_text(message: str) -> None:
     )
 
     response = requests.get(url)
-    assert json.load(response.json())['status_code] == "200"
+    assert response.status_code == 200
     return
 
 
@@ -44,11 +43,11 @@ def check_meta_opening() -> None:
                                       
         msg = (
             f'Maybe Meta posted internship openings today! Check:\n\n'
-            f'{url}'
+            f'{meta_url}'
         )
     
     # Send a correct message to me
-    send_text(meta_url)
+    send_text(msg)
     return
 
 # # Uncomment this if run on cloud  

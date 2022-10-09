@@ -1,11 +1,13 @@
+import os
 import requests
+from bs4 import BeautifulSoup
+import json
 import time
 import schedule
-from bs4 import BeautifulSoup
-import os
 
 
-def send_text(message):
+def send_text(message: str) -> None:
+    
     # Define parameters
     bot_token = os.environ['TELEGRAM BOT TOKEN']
     my_chat_id = os.environ['TELEGRAM CHAT ID']
@@ -18,35 +20,46 @@ def send_text(message):
     )
 
     response = requests.get(url)
-    return response.json()
+    assert json.load(response.json())['status_code] == "200"
+    return
 
 
-def check_meta_opening():
-    # Search meta jobs with filter intern
-    url = "https://www.metacareers.com/jobs?q=intern&roles=intern"
-    response = requests.get(url)
+def check_meta_opening() -> None:
+                                      
+    # Search meta jobs with filter on "intern"
+    meta_url = "https://www.metacareers.com/jobs?q=intern&roles=intern"
+    response = requests.get(meta_url)
     soup = BeautifulSoup(response.content, 'html.parser')
 
-    # Find "There are currently no open opportunities, please check back soon!"
-    if soup.find("div", {"class": "_6b80"}):
-        no_opening_text = soup.find("div", {"class": "_6b80"}).text
+    # Find the text: "There are currently no open opportunities, please check back soon!"
+    no_opening_ele = soup.find("div", {"class": "_6b80"})
+    if no_opening_ele: # get class from browser inspect console
+                                      
         msg = (
-            f'Don\'t think Meta posted any internship postings today:\n'
-            f'Found: "{no_opening_text}"'
+            f'I think Meta\'s internships are still closed today. Found:\n\n'
+            f'`{no_opening_ele.text}`'
         )
+                                      
     else:
+                                      
         msg = (
-            f'Maybe Meta posted internship postings today!:\n'
-            f'Check: "{url}"'
+            f'Maybe Meta posted internship openings today! Check:\n\n'
+            f'{url}'
         )
-    send_text(msg)
+    
+    # Send a correct message to me
+    send_text(meta_url)
+    return
 
-
+# # Uncomment this if run on cloud  
 # schedule.every().day.at("15:00").do(check_meta_opening)
-# schedule.every(2).minutes.do(check_meta_opening)
 
 if __name__ == '__main__':
+                                      
+    # Run using Window's built-in Task Scheduler
     check_meta_opening()
+                                      
+    # # Uncommment this if run on cloud
     # while True:
     #     schedule.run_pending()
     #     time.sleep(1)

@@ -23,27 +23,27 @@ def send_text(message: str) -> None:
     return
 
 
-def check_meta_opening() -> None:
+def check_opening(company: str, opening_url: str, no_opening_ele_id: str, no_opening_ele_type: str) -> None:
                                       
     # Search meta jobs with filter on "intern"
-    meta_url = "https://www.metacareers.com/jobs?q=intern&roles=intern"
-    response = requests.get(meta_url)
+    response = requests.get(opening_url)
     soup = BeautifulSoup(response.content, 'html.parser')
 
     # Find the text: "There are currently no open opportunities, please check back soon!"
-    no_opening_ele = soup.find("div", {"class": "_6b80"})
+    no_opening_ele = soup.find(f"{no_opening_ele_type}", {"class": f"{no_opening_ele_id}"})
+    print(no_opening_ele)
     if no_opening_ele: # get class from browser inspect console
                                       
         msg = (
-            f'I think Meta\'s internships are still closed today. Found:\n\n'
+            f'I think {company.upper()}\'s internships are still closed today. Found:\n\n'
             f'`{no_opening_ele.text}`'
         )
                                       
     else:
                                       
         msg = (
-            f'Maybe Meta posted internship openings today! Check:\n\n'
-            f'{meta_url}'
+            f'Maybe {company.upper()} posted internship openings today! Check:\n\n'
+            f'{opening_url}'
         )
     
     # Send a correct message to me
@@ -53,11 +53,13 @@ def check_meta_opening() -> None:
 # # Uncomment this if run on cloud  
 # schedule.every().day.at("15:00").do(check_meta_opening)
 
+
 if __name__ == '__main__':
                                       
     # Run using Window's built-in Task Scheduler
-    check_meta_opening()
-                                      
+    check_opening("meta", "https://www.metacareers.com/jobs?q=intern&roles=intern", "_6b80", "div")
+    check_opening("duolingo", "https://careers.duolingo.com/?type=Intern&department=Software+Engineering", "F_CHk", "p")
+
     # # Uncommment this if run on cloud
     # while True:
     #     schedule.run_pending()
